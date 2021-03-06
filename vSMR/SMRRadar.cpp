@@ -467,6 +467,7 @@ void CSMRRadar::OnAsrContentToBeSaved()
 
 void CSMRRadar::ReloadActiveRunways()
 {
+	Logger::info("SMRRadar 470");
 	CSectorElement rwy;
 	for (rwy = GetPlugIn()->SectorFileElementSelectFirst(SECTOR_ELEMENT_RUNWAY); rwy.IsValid(); rwy = GetPlugIn()->SectorFileElementSelectNext(rwy, SECTOR_ELEMENT_RUNWAY)) {
 		if (StartsWith(ActiveAirport, rwy.GetAirportName())) {
@@ -489,6 +490,7 @@ void CSMRRadar::ReloadActiveRunways()
 			}
 		}
 	}
+	Logger::info("SMRRadar 493");
 }
 
 void CSMRRadar::OnMoveScreenObject(int ObjectType, const char * sObjectId, POINT Pt, RECT Area, bool Released)
@@ -1935,6 +1937,7 @@ void CSMRRadar::OnRefresh(HDC hDC, int Phase)
 	graphics.SetPageUnit(UnitPixel);
 	graphics.SetSmoothingMode(SmoothingModeAntiAlias);
 
+	Logger::info("SMRRadar 1938");
 	AirportPositions.clear();
 	for (CSectorElement apt = GetPlugIn()->SectorFileElementSelectFirst(SECTOR_ELEMENT_AIRPORT);
 		apt.IsValid();
@@ -1944,6 +1947,7 @@ void CSMRRadar::OnRefresh(HDC hDC, int Phase)
 		AirportPositions[apt.GetName()] = Pos;
 	}
 
+	Logger::info("SMRRadar 1948");
 	if (QDMSelectEnabled || QDMenabled) {
 		CRect R(GetRadarArea());
 		R.top += 20;
@@ -1953,6 +1957,7 @@ void CSMRRadar::OnRefresh(HDC hDC, int Phase)
 		AddScreenObject(DRAWING_BACKGROUND_CLICK, "", R, false, "");
 	}
 
+	Logger::info("SMRRadar 1958");
 	for (auto runway : RimcasInstance->Runways) {
 		if (runway.closed) { // if runway is closed
 
@@ -1974,21 +1979,25 @@ void CSMRRadar::OnRefresh(HDC hDC, int Phase)
 		}
 	}
 
+	Logger::info("SMRRadar 1979");
 	RimcasInstance->OnRefreshBegin(isLVP);
 
     // ---------------
 	// Drawing targets
 	// ---------------
+	Logger::info("SMRRadar 1986");
 	DrawTargets(&graphics, &dc, nullptr);
 
 	// ---------------
 	// RIMCAS 
 	// ---------------
+	Logger::info("SMRRadar 1992");
 	RimcasInstance->OnRefreshEnd(this, CurrentConfig->getActiveProfile()["rimcas"]["rimcas_stage_two_speed_threshold"].GetInt());
 
 	// --------------
 	// Drawing Tags
 	// --------------
+	Logger::info("SMRRadar 1998");
 	DrawTags(&graphics, nullptr);
 
 	// --------------
@@ -1998,6 +2007,7 @@ void CSMRRadar::OnRefresh(HDC hDC, int Phase)
 		TagDeconflict();
 	}
 
+	Logger::info("SMRRadar 2008");
 	RimcasInstance->AcOnRunway.clear();
 	ColorAC.clear();
 	tagAreas.clear();
@@ -2010,6 +2020,7 @@ void CSMRRadar::OnRefresh(HDC hDC, int Phase)
 	// --------------
 	// Drawing IAW
 	// --------------
+	Logger::info("SMRRadar 2021");
 	int oldDC = SaveDC(dc);
 
 	Logger::info("RIMCAS Loop");
@@ -2023,6 +2034,7 @@ void CSMRRadar::OnRefresh(HDC hDC, int Phase)
 		if (TimePopupAreas.find(rwy.name) == TimePopupAreas.end())
 			TimePopupAreas[rwy.name] = { 300, 300, 380, 380 };
 
+		Logger::info("SMRRadar 2037");
 		CRect baseRect = TimePopupAreas[rwy.name];
 		baseRect.NormalizeRect();
 		POINT center = baseRect.CenterPoint();
@@ -2043,6 +2055,7 @@ void CSMRRadar::OnRefresh(HDC hDC, int Phase)
 		arcOuterEnd.x = center.x;
 		arcOuterEnd.y = outerRect.bottom;
 
+		Logger::info("SMRRadar 2058");
 		for (const auto &aircraft : RimcasInstance->IAWQueue[rwy.name]) {
 
 			double arcAngle = aircraft.time / 90 * M_PI; // [0-180sec] -> [0-2Pi]
@@ -2103,6 +2116,7 @@ void CSMRRadar::OnRefresh(HDC hDC, int Phase)
 		}
 
 		AddScreenObject(RIMCAS_IAW, rwy.name, baseRect, true, "");
+		Logger::info("SMRRadar 2119");
 	}
 
 	RestoreDC(dc, oldDC);
@@ -2283,6 +2297,7 @@ void CSMRRadar::OnRefresh(HDC hDC, int Phase)
 	//---------------------------------
 	// Drawing distance tools
 	//---------------------------------
+	Logger::info("SMRRadar 2295");
 	DrawDistanceTools(&graphics, &dc, nullptr);
 
 	//---------------------------------
@@ -2542,6 +2557,7 @@ void CSMRRadar::DrawTags(Graphics* graphics, CInsetWindow* insetWindow)
 		CFlightPlan fp = GetPlugIn()->FlightPlanSelect(rt.GetCallsign());
 		int reportedGs = rt.GetPosition().GetReportedGS();
 
+		Logger::info("SMRRadar 2552");
 		// Filtering the targets
 		if (insetWindow == nullptr && !ShouldDraw(rt))
 			continue;
@@ -2558,6 +2574,7 @@ void CSMRRadar::DrawTags(Graphics* graphics, CInsetWindow* insetWindow)
 		//if (std::find(ReleasedTracks.begin(), ReleasedTracks.end(), rt.GetSystemID()) != ReleasedTracks.end())
 		//isAcDisplayed = false;
 
+		Logger::info("SMRRadar 2569");
 		// Getting the tag center/offset
 		POINT acPosPix;
 		POINT TagCenter;
@@ -2596,7 +2613,7 @@ void CSMRRadar::DrawTags(Graphics* graphics, CInsetWindow* insetWindow)
 			TagCenter.y = long(acPosPix.y + float(length * sin(DegToRad(insetWindow->m_TagAngles[rt.GetCallsign()]))));
 		}
 
-
+		Logger::info("SMRRadar 2608");
 		TagTypes TagType = TagTypes::Departure;
 		TagTypes ColorTagType = TagTypes::Departure;
 
@@ -2623,6 +2640,7 @@ void CSMRRadar::DrawTags(Graphics* graphics, CInsetWindow* insetWindow)
 			ColorTagType = TagTypes::Uncorrelated;
 		}
 
+		Logger::info("SMRRadar 2635");
 		map<CBString, TagItem> TagMap = GenerateTagData(rt, fp, this, ActiveAirport);
 
 		StringFormat* stformat = new Gdiplus::StringFormat();
@@ -2671,7 +2689,7 @@ void CSMRRadar::DrawTags(Graphics* graphics, CInsetWindow* insetWindow)
 		if (!LabelLines.IsArray())
 			continue;
 		
-
+		Logger::info("SMRRadar 2684");
 		REAL TagWidth = 0, TagHeight = 0;
 		REAL TAG_PADDING_LEFT = 0;// (REAL)(currentFontSize / 4.0);
 		REAL TAG_PADDING_RIGHT = 0;// TAG_PADDING_LEFT;
@@ -2757,6 +2775,7 @@ void CSMRRadar::DrawTags(Graphics* graphics, CInsetWindow* insetWindow)
 		// ---------------------
 		// Drawing the tag
 		// ---------------------
+		Logger::info("SMRRadar 2770");
 		CRect TagBackgroundRect((int)(TagCenter.x - (TagWidth / 2.0)), (int)(TagCenter.y - (TagHeight / 2.0)), (int)(TagCenter.x + (TagWidth / 2.0)), (int)(TagCenter.y + (TagHeight / 2.0)));
 		
 		// We only draw if the tag is:
@@ -2778,6 +2797,7 @@ void CSMRRadar::DrawTags(Graphics* graphics, CInsetWindow* insetWindow)
 			}
 		}
 
+		Logger::info("SMRRadar 2792");
 		if (shouldDraw) {
 			SolidBrush TagBackgroundBrush(TagBackgroundColor);
 			graphics->FillRectangle(&TagBackgroundBrush, CopyRect(TagBackgroundRect));

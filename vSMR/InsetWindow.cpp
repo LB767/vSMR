@@ -164,6 +164,7 @@ RECT CInsetWindow::DrawToolbarButton(CDC * dc, const char* letter, CRect TopBar,
 
 void CInsetWindow::render(HDC hDC, CSMRRadar * radar_screen, Graphics* gdi, POINT mouseLocation, multimap<CBString, CBString> DistanceTools)
 {
+	Logger::info("InsetWindow Render");
 	CDC dc;
 	dc.Attach(hDC);
 
@@ -186,12 +187,14 @@ void CInsetWindow::render(HDC hDC, CSMRRadar * radar_screen, Graphics* gdi, POIN
 	refPt.x += m_Offset.x;
 	refPt.y += m_Offset.y;
 
+	Logger::info("InsetWindow 190");
 	// Here we draw all runways for the airport
 	for (CSectorElement rwy = radar_screen->GetPlugIn()->SectorFileElementSelectFirst(SECTOR_ELEMENT_RUNWAY);
 		rwy.IsValid();
 		rwy = radar_screen->GetPlugIn()->SectorFileElementSelectNext(rwy, SECTOR_ELEMENT_RUNWAY))
 	{
 
+		Logger::info("InsetWindow 197");
 		if (StartsWith(icao, rwy.GetAirportName()))
 		{
 			CPen RunwayPen(PS_SOLID, 1, radar_screen->CurrentConfig->getConfigColorRef(radar_screen->CurrentConfig->getActiveProfile()["approach_insets"]["runway_color"]));
@@ -213,6 +216,7 @@ void CInsetWindow::render(HDC hDC, CSMRRadar * radar_screen, Graphics* gdi, POIN
 
 			}
 
+			Logger::info("InsetWindow 219");
 			if (rwy.IsElementActive(false, 0) || rwy.IsElementActive(false, 1))
 			{
 				CPosition Threshold, OtherEnd;
@@ -268,9 +272,10 @@ void CInsetWindow::render(HDC hDC, CSMRRadar * radar_screen, Graphics* gdi, POIN
 	}
 
 	// Aircrafts
+	Logger::info("InsetWindow 274");
 	radar_screen->DrawTargets(gdi, &dc, this);
 	radar_screen->DrawTags(gdi, this);
-	
+	Logger::info("InsetWindow 277");
 
 	/*
 	CRadarTarget rt;
